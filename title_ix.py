@@ -10,7 +10,9 @@ header = ('CaseNumber',
           'DateOpened',
           'Status',
           'OpenFor',
-          'DateResolved')
+          'DateResolved',
+          'CampusContext')
+
        
 with open('federal_title_ix_investigations.txt', 'wb') as f:
     writer = csv.writer(f)
@@ -25,12 +27,14 @@ with open('federal_title_ix_investigations.txt', 'wb') as f:
             institution_name = case_page.select('h3')[0].text
             institution_url = case_page.select('a')[1].text
             row = [case_no, institution_name, institution_url, url % case_no]
-            row.extend(['NA']*4)            
+            row.extend(['NA']*5)            
             info_table = soup.select("div.info-table")[0]
             i = 4
             for case_row in info_table.select("div.case-row"):
                 value = case_row.select('span.value')[0].text.replace(u'\xa0', '')
                 row[i] = value
                 i += 1
+            items = soup.select('div.item')[1].select('li')
+            row[8]=' '.join(item.text for item in items).encode('ascii', 'ignore')
             writer.writerow(row)
             print (row)
